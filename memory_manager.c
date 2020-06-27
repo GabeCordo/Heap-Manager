@@ -120,3 +120,50 @@ void mm_instance_new_page_family(char *struct_name, uint32_t struct_size) {
 	vm_page_family_curr->struct_size = struct_size;
 	vm_page_family_curr->first_page = NULL;
 }
+
+/*
+ * Function:  mm_print_registered_page_families
+ * --------------------------------------------
+ * print out all the page-family registrations found
+ * within the virtual memory pages on the lmm
+ *
+ */
+void mm_print_registered_page_families() {
+	
+	vm_page_for_family_t *vm_page_family_curr = NULL;
+	vm_page_for_families_t *new_vm_page_for_families_curr = NULL;
+	
+	for(new_vm_page_for_families_curr = first_vm_page_for_families;
+		first_vm_page_for_families_curr; //iterate over each pahe till next is a NULL value
+		new_vm_page_for_families_curr = new_vm_page_for_families_curr->next) {
+			
+		ITERATE_PAGE_FAMILIES_BEGIN(new_vm_page_for_families_curr, vm_page_family_curr) {
+				
+			printf("Page Family:%s, Size = %u\n", 
+				vm_page_family_curr->struct_name,
+				vm_page_family_curr->struct_size);
+				
+		} ITERATE_PAGE_FAMILIES_END(new_vm_page_for_families_curr, vm_page_family_curr);
+	}
+}
+
+vm_page_family_t *lookup_page_family_by_name(char *struct_name) {
+	
+	vm_page_for_family_t *vm_page_family_curr = NULL;
+	vm_page_for_families_t *new_vm_page_for_families_curr = NULL;
+		
+	for(new_vm_page_for_families_curr = first_vm_page_for_families;
+		first_vm_page_for_families_curr; //iterate over each pahe till next is a NULL value
+		new_vm_page_for_families_curr = new_vm_page_for_families_curr->next) {
+				
+		ITERATE_PAGE_FAMILIES_BEGIN(new_vm_page_for_families_curr, vm_page_family_curr) {
+					
+			if(strncpy(vm_page_family_curr->struct_name, struct_name, MM_MAX_STRUCT_NAME) == 0) {
+				return vm_page_family_curr;
+			}
+					
+		} ITERATE_PAGE_FAMILIES_END(new_vm_page_for_families_curr, vm_page_family_curr);		
+	}
+	
+	return NULL;
+}
